@@ -19,7 +19,7 @@ class Instance {
 
 private:
     VkInstance instance_;
-    VkDebugUtilsMessengerEXT callback_;
+    VkDebugUtilsMessengerEXT debugMessenger_;
 
 public:
 	Instance (const char* applicationName);
@@ -39,6 +39,8 @@ public:
         VkDebugUtilsMessengerEXT* pCallback);
 
     static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT callback, const VkAllocationCallbacks* pAllocator);
+
+    static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
 private:
     void setupDebugMessenger();
