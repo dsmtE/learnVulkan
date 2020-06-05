@@ -9,6 +9,7 @@
 
 Instance::Instance(const char* applicationName) {
 
+    std::cout << "[vulkan initialisation] Instance creation" << std::endl;
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error("les validations layers sont activées mais ne sont pas disponibles!");
     }

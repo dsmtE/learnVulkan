@@ -6,6 +6,7 @@
 #include <string>
 
 #include "vulkanObjects/Instance.hpp"
+#include "vulkanObjects/Devices.hpp"
 
 class App {
 
@@ -18,6 +19,7 @@ private:
 
     // vulkan objects
     Instance* instance_;
+    Devices* devices_;
 
 public:
     App(const char* name, const  uint32_t& width = 800, const uint32_t& height = 600);

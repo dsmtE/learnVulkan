@@ -22,8 +22,10 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger_;
 
 public:
-	Instance (const char* applicationName);
-	~Instance ();
+	Instance(const char* applicationName);
+	~Instance();
+
+    inline VkInstance& getVkInstance() { return instance_; }
 
     // VKAPI_ATTR & VKAPI_CALL here for compiler compatibilities
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback( 
