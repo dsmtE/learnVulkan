@@ -10,7 +10,7 @@ private:
 
 	VkSurfaceKHR _surface;
 public:
-	Surface(const VkInstance& instance);
+	Surface(const VkInstance& instance, GLFWwindow* window);
 	~Surface();
 
 	inline VkSurfaceKHR& getVkSUrface() { return _surface; }

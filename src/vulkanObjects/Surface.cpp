@@ -1,13 +1,10 @@
 #include "Surface.hpp"
+#include <stdexcept>
 
-Surface(const VkInstance& instance) {
-	VkWin32SurfaceCreateInfoKHR createInfo{};
-	createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	createInfo.hwnd = glfwGetWin32Window(window);
-	createInfo.hinstance = GetModuleHandle(nullptr);
+Surface::Surface(const VkInstance& instance, GLFWwindow* window) {
 
-	if (vkCreateWin32SurfaceKHR(instance, &createInfo, nullptr, &surface) != VK_SUCCESS) {
-		throw std::runtime_error("échec de la creation d'une window surface!");
+	if (glfwCreateWindowSurface(instance, window, nullptr, &_surface) != VK_SUCCESS) {
+		throw std::runtime_error("Window surface creation failed!");
 	}
 }
 
