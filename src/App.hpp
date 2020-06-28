@@ -7,6 +7,7 @@
 
 #include "vulkanObjects/Instance.hpp"
 #include "vulkanObjects/Devices.hpp"
+#include "vulkanObjects/Surface.hpp"
 
 class App {
 
@@ -20,13 +21,14 @@ private:
     // vulkan objects
     Instance* instance_;
     Devices* devices_;
+    Surface* _surface;
 
 public:
     App(const char* name, const  uint32_t& width = 800, const uint32_t& height = 600);
+    ~App();
     void run();
 
 private:
     void initWindow();
     void mainLoop();
-    void cleanup();
 };

@@ -1,11 +1,14 @@
 #include "Devices.hpp"
 
 #include <iostream>
-Devices::Devices(const VkInstance& instance) : physicalDevice_{ VK_NULL_HANDLE }, logicalDevice_{ VK_NULL_HANDLE } {
+#include <set>
+
+Devices::Devices(const VkInstance& instance, const VkSurfaceKHR& surface) : physicalDevice_{ VK_NULL_HANDLE }, logicalDevice_{ VK_NULL_HANDLE } {
 
 	#ifndef NDEBUG
 		std::cout << "[vulkan initialisation] Devices initialisation " << std::endl;
 	#endif
+
 	
 	////////////////////////////// PhysicalDevices ////////////////////////////////
 
@@ -25,7 +28,7 @@ Devices::Devices(const VkInstance& instance) : physicalDevice_{ VK_NULL_HANDLE }
 
 	for (const auto& device : devices) {
 		int score = 0;
-		if (isPhysicalDeviceSuitable(device, score)) { // add only suitable devices
+		if (isPhysicalDeviceSuitable(device, surface, score)) { // add only suitable devices
 			candidates.insert(std::make_pair(score, device));
 		}	
 	}
@@ -44,23 +47,28 @@ Devices::Devices(const VkInstance& instance) : physicalDevice_{ VK_NULL_HANDLE }
 
 	////////////////////////////// VirtualDevices ////////////////////////////////
 
-	QueueFamilyIndices indices = findQueueFamilies(physicalDevice_);
+	QueueFamilyIndices indices = findQueueFamilies(physicalDevice_, surface);
 
-	VkDeviceQueueCreateInfo queueCreateInfo{};
-	queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-	queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-	queueCreateInfo.queueCount = 1;
+	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
 	float queuePriority = 1.0f;
-	queueCreateInfo.pQueuePriorities = &queuePriority;
+	for (uint32_t queueFamily : uniqueQueueFamilies) {
+		VkDeviceQueueCreateInfo queueCreateInfo{};
+		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		queueCreateInfo.queueFamilyIndex = queueFamily;
+		queueCreateInfo.queueCount = 1;
+		queueCreateInfo.pQueuePriorities = &queuePriority;
+		queueCreateInfos.push_back(queueCreateInfo);
+	}
 
 	VkPhysicalDeviceFeatures deviceFeatures{};
 
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-	createInfo.pQueueCreateInfos = &queueCreateInfo;
-	createInfo.queueCreateInfoCount = 1;
+	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+	createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
 	createInfo.pEnabledFeatures = &deviceFeatures;
 
@@ -80,6 +88,7 @@ Devices::Devices(const VkInstance& instance) : physicalDevice_{ VK_NULL_HANDLE }
 	}
 
 	vkGetDeviceQueue(logicalDevice_, indices.graphicsFamily.value(), 0, &graphicsQueue_);
+	vkGetDeviceQueue(logicalDevice_, indices.presentFamily.value(), 0, &_presentQueue);
 }
 
 Devices::~Devices() {
@@ -88,14 +97,14 @@ Devices::~Devices() {
 }
 
 
-bool Devices::isPhysicalDeviceSuitable(VkPhysicalDevice device, int& score) {
+bool Devices::isPhysicalDeviceSuitable(VkPhysicalDevice device, const VkSurfaceKHR& surface, int& score) {
 
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-	QueueFamilyIndices indices = findQueueFamilies(device);
+	QueueFamilyIndices indices = findQueueFamilies(device, surface);
 	if (indices.isComplete()) { // suitable
 		score = 0;
 
@@ -111,7 +120,7 @@ bool Devices::isPhysicalDeviceSuitable(VkPhysicalDevice device, int& score) {
 	return false;
 }
 
-QueueFamilyIndices Devices::findQueueFamilies(VkPhysicalDevice device) {
+QueueFamilyIndices Devices::findQueueFamilies(VkPhysicalDevice device, const VkSurfaceKHR& surface) {
 	QueueFamilyIndices indices;
 
 	uint32_t queueFamilyCount = 0;
@@ -124,6 +133,13 @@ QueueFamilyIndices Devices::findQueueFamilies(VkPhysicalDevice device) {
 	for (const auto& queueFamily : queueFamilies) {
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 			indices.graphicsFamily = i;
+		}
+
+		VkBool32 presentSupport = false;
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+		if (presentSupport) {
+			indices.presentFamily = i;
 		}
 
 		if (indices.isComplete()) {

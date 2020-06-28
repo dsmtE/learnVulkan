@@ -8,7 +8,8 @@ App::App(const char* name, const uint32_t& width, const uint32_t& height) : name
     // init vulkan
     try {
         instance_ = new Instance("Vulkan app");
-        devices_ = new Devices(instance_->getVkInstance());
+        _surface = new Surface(instance_->getVkInstance());
+        devices_ = new Devices(instance_->getVkInstance(), _surface->getVkSUrface());
 
     } catch (const std::exception& e) {
         std::cerr << "std::exception: " << e.what() << std::endl;
@@ -16,9 +17,18 @@ App::App(const char* name, const uint32_t& width, const uint32_t& height) : name
 
 }
 
+App::~App() {
+    delete _surface;
+    delete devices_;
+    delete instance_;
+
+    glfwDestroyWindow(window_);
+
+    glfwTerminate();
+}
+
 void App::run() {
     mainLoop();
-    cleanup();
 }
 
 
@@ -33,10 +43,4 @@ void App::mainLoop() {
     while (!glfwWindowShouldClose(window_)) {
         glfwPollEvents();
     }
-}
-
-void App::cleanup() {
-    glfwDestroyWindow(window_);
-
-    glfwTerminate();
 }
