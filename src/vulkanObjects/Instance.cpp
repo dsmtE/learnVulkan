@@ -11,7 +11,7 @@ Instance::Instance(const char* applicationName) {
 
     std::cout << "[vulkan initialisation] Instance creation" << std::endl;
     if (enableValidationLayers && !checkValidationLayerSupport()) {
-        throw std::runtime_error("les validations layers sont activées mais ne sont pas disponibles!");
+        throw std::runtime_error("Validation layers requested, but not available!");
     }
 
     VkApplicationInfo appInfo{};
@@ -26,7 +26,7 @@ Instance::Instance(const char* applicationName) {
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    std::vector<const char*> requiredExtensions = getRequiredExtensions();
+    const std::vector<const char*> requiredExtensions = getRequiredExtensions();
     checkExtensions(requiredExtensions);
 
     createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());

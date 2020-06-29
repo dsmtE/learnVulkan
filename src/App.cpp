@@ -8,7 +8,7 @@ App::App(const char* name, const uint32_t& width, const uint32_t& height) : name
     // init vulkan
     try {
         instance_ = new Instance("Vulkan app");
-        _surface = new Surface(instance_->getVkInstance());
+        _surface = new Surface(instance_->getVkInstance(), window_);
         devices_ = new Devices(instance_->getVkInstance(), _surface->getVkSUrface());
 
     } catch (const std::exception& e) {
