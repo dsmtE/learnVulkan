@@ -6,7 +6,8 @@
 #include <string>
 
 #include "vulkanObjects/Instance.hpp"
-#include "vulkanObjects/Devices.hpp"
+#include "vulkanObjects/PhysicalDevice.hpp"
+#include "vulkanObjects/LogicalDevice.hpp"
 #include "vulkanObjects/Surface.hpp"
 
 class App {
@@ -20,7 +21,8 @@ private:
 
     // vulkan objects
     Instance* instance_;
-    Devices* devices_;
+    PhysicalDevice* physicalDevice_;
+    LogicalDevice* logicalDevice_;
     Surface* _surface;
 
 public:
