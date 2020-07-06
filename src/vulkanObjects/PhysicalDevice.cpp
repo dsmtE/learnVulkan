@@ -150,8 +150,8 @@ bool PhysicalDevice::checkDeviceExtensionSupport(const VkPhysicalDevice& device)
 
 	bool allFound = true;
 	const auto end = availableExtensions.end();
-	for (const char* neededExtension : neededDeviceExtensions) {
-		if (std::find_if(availableExtensions.begin(), end, [&neededExtension](const VkExtensionProperties& e) { return std::strcmp(neededExtension, e.extensionName); }) == end) {
+	for (const char* nExt : neededDeviceExtensions) {
+		if (!std::any_of(availableExtensions.begin(), availableExtensions.end(), [&nExt](const VkExtensionProperties& e) { return std::strcmp(nExt, e.extensionName) == 0; })) {
 			allFound = false;
 			break;
 		}
