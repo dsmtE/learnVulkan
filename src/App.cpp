@@ -11,6 +11,7 @@ App::App(const char* name, const uint32_t& width, const uint32_t& height) : name
         _surface = new Surface(instance_->getVkInstance(), window_);
         physicalDevice_ = new PhysicalDevice(instance_->getVkInstance(), _surface->getVkSUrface());
         logicalDevice_ = new LogicalDevice(*physicalDevice_);
+        swapChain_ = new SwapChain(*physicalDevice_, *logicalDevice_, *_surface);
 
     } catch (const std::exception& e) {
         std::cerr << "std::exception: " << e.what() << std::endl;
@@ -19,6 +20,7 @@ App::App(const char* name, const uint32_t& width, const uint32_t& height) : name
 }
 
 App::~App() {
+    delete swapChain_;
     delete logicalDevice_;
     delete physicalDevice_;
     delete _surface;

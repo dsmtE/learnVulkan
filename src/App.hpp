@@ -9,6 +9,7 @@
 #include "vulkanObjects/PhysicalDevice.hpp"
 #include "vulkanObjects/LogicalDevice.hpp"
 #include "vulkanObjects/Surface.hpp"
+#include "vulkanObjects/SwapChain.hpp"
 
 class App {
 
@@ -24,6 +25,7 @@ private:
     PhysicalDevice* physicalDevice_;
     LogicalDevice* logicalDevice_;
     Surface* _surface;
+    SwapChain* swapChain_;
 
 public:
     App(const char* name, const  uint32_t& width = 800, const uint32_t& height = 600);

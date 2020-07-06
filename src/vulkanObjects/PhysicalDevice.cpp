@@ -1,7 +1,17 @@
 #include "PhysicalDevice.hpp"
 
+#include "SwapChain.hpp"
+
 #include <iostream>
 #include <set>
+#include <map>
+#include <algorithm>
+#include <cstring>
+
+//static member declaration
+const std::vector<const char*> PhysicalDevice::neededDeviceExtensions = {{
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+}};
 
 PhysicalDevice::PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface) : physicalDevice_{ VK_NULL_HANDLE }, instance_r{ instance }, surface_r{ surface } {
 
@@ -28,23 +38,28 @@ PhysicalDevice::PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& s
 		int score = 0;
 		if (isPhysicalDeviceSuitable(device, surface_r, score)) { // add only suitable devices
 			candidates.insert(std::make_pair(score, device));
-		}	
+		}
 	}
-
-	// TODO display the score and let the user choose the GPU manually
-	if (candidates.rbegin()->first > 0) {
-		// select our physical device
-		physicalDevice_ = candidates.rbegin()->second;
-		// save queue family indices
-		queueFamilyIndices_ = findQueueFamilies(physicalDevice_, surface_r);
-		#ifndef NDEBUG
+	if (candidates.size() > 0) {
+		// TODO display the score and let the user choose the GPU manually
+		if (candidates.rbegin()->first > 0) {
+			// select our physical device
+			physicalDevice_ = candidates.rbegin()->second;
+			// save queue family indices
+			queueFamilyIndices_ = findQueueFamilies(physicalDevice_, surface_r);
+#ifndef NDEBUG
 			VkPhysicalDeviceProperties deviceProperties;
 			vkGetPhysicalDeviceProperties(physicalDevice_, &deviceProperties);
-				std::cout << "[PhysicalDevice] selected device: " <<  deviceProperties.deviceName << " apiVersion: " << deviceProperties.apiVersion << " driverVersion: " << deviceProperties.driverVersion << std::endl;
-		#endif
+			std::cout << "[PhysicalDevice] selected device: " << deviceProperties.deviceName << " apiVersion: " << deviceProperties.apiVersion << " driverVersion: " << deviceProperties.driverVersion << std::endl;
+#endif
 
-	} else {
-		throw std::runtime_error("[PhysicalDevices] Error: No graphics card can run this program !");
+		}
+		else {
+			throw std::runtime_error("[PhysicalDevices] Error: No graphics card can run this program !");
+		}
+	}
+	else {
+		throw std::runtime_error("[PhysicalDevices] Error: No suitable graphics card found !");
 	}
 
 }
@@ -53,7 +68,7 @@ PhysicalDevice::~PhysicalDevice() {
 }
 
 
-bool PhysicalDevice::isPhysicalDeviceSuitable(VkPhysicalDevice device, const VkSurfaceKHR& surface, int& score) {
+bool PhysicalDevice::isPhysicalDeviceSuitable(const VkPhysicalDevice& device, const VkSurfaceKHR& surface, int& score) {
 
 	VkPhysicalDeviceProperties deviceProperties;
 	VkPhysicalDeviceFeatures deviceFeatures;
@@ -61,7 +76,14 @@ bool PhysicalDevice::isPhysicalDeviceSuitable(VkPhysicalDevice device, const VkS
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
 	QueueFamilyIndices indices = findQueueFamilies(device, surface);
-	if (indices.isComplete()) { // suitable
+	const bool extensionsSupported = checkDeviceExtensionSupport(device);
+
+	bool swapChainAdequate = false;
+	if (extensionsSupported) {
+		SwapChainSupportDetails swapChainSupport = SwapChain::querySwapChainSupport(device, surface);
+		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+	}
+	if (indices.isComplete() && extensionsSupported && swapChainAdequate) { // suitable
 		score = 0;
 
 		// Dedicated graphics cards have a huge performance advantage
@@ -106,4 +128,33 @@ QueueFamilyIndices PhysicalDevice::findQueueFamilies(const VkPhysicalDevice& dev
 	}
 
 	return indices;
+}
+
+bool PhysicalDevice::checkDeviceExtensionSupport(const VkPhysicalDevice& device) {
+	uint32_t extensionCount;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+#ifdef NDEBUG
+	std::cout << "[check Device Extension Support]" << std::endl;
+	VkPhysicalDeviceProperties deviceProperties;
+	vkGetPhysicalDeviceProperties(device, &deviceProperties);
+	std::cout << "AvailableExtensions for the device " << deviceProperties.deviceName << " :" << std::endl;
+	for (const auto& ae : availableExtensions)
+		std::cout <<"	- " << ae.extensionName << std::endl;
+	std::cout << "needed extentions :" <<  std::endl;
+	for (const auto& ne : neededDeviceExtensions)
+		std::cout << "	- " << neededExtension << std::endl;
+#endif
+
+	bool allFound = true;
+	const auto end = availableExtensions.end();
+	for (const char* neededExtension : neededDeviceExtensions) {
+		if (std::find_if(availableExtensions.begin(), end, [&neededExtension](const VkExtensionProperties& e) { return std::strcmp(neededExtension, e.extensionName); }) == end) {
+			allFound = false;
+			break;
+		}
+	}
+	return allFound;
 }

@@ -5,7 +5,7 @@
 #include <vulkan/vulkan.h>
 
 #include <optional>
-#include <map>
+#include <string>
 #include <vector>
 
 struct QueueFamilyIndices {
@@ -17,12 +17,16 @@ struct QueueFamilyIndices {
 
 class PhysicalDevice {
 
+public:
+    static const std::vector<const char*> neededDeviceExtensions;
+
 private:
     VkPhysicalDevice physicalDevice_; // Implicitly deleted with instance
     QueueFamilyIndices queueFamilyIndices_; // Used to store familyIndices of the selected device
 
     const VkInstance& instance_r;
     const VkSurfaceKHR& surface_r;
+
 
 public:
     PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface);
@@ -36,8 +40,9 @@ public:
 
 private:
     // Check if GPU is suitable and return rating throught reference
-    static bool isPhysicalDeviceSuitable(VkPhysicalDevice device, const VkSurfaceKHR& surface, int& score);
+    static bool isPhysicalDeviceSuitable(const VkPhysicalDevice& device, const VkSurfaceKHR& surface, int& score);
     // Get needed families queue indices
     static QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice& device, const VkSurfaceKHR& surface);
 
+    static bool checkDeviceExtensionSupport(const VkPhysicalDevice& device);
 };
