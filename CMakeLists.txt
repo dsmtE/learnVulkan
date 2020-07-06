@@ -19,6 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out)
 set(MAIN_FILE ${CMAKE_SOURCE_DIR}/src/main.cpp)
 file(GLOB_RECURSE SRC_FILES  ${CMAKE_SOURCE_DIR}/src/*.cpp )
 LIST(REMOVE_ITEM SRC_FILES ${MAIN_FILE})
+file(GLOB_RECURSE HEADER_FILES  ${CMAKE_SOURCE_DIR}/src/*.hpp )
 
 # /////////////////////////////// DEPENDENCIES ////////////////////////////////
 
@@ -91,7 +92,7 @@ set(LIBRARIES
 # /////////////////////////////////// BUILD ///////////////////////////////////
 
 get_filename_component(FILE_NAME ${MAIN_FILE} NAME_WE)
-add_executable(${FILE_NAME} ${MAIN_FILE} ${SRC_FILES})
+add_executable(${FILE_NAME} ${MAIN_FILE} ${SRC_FILES} ${HEADER_FILES})
 
 # Enable warnings
 if(MSVC)
