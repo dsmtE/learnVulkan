@@ -26,11 +26,13 @@ Instance::Instance(const char* applicationName) {
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    const std::vector<const char*> requiredExtensions = getRequiredExtensions();
-    checkExtensions(requiredExtensions);
+    const std::vector<const char*> neededExtensions = getNeededExtensions();
 
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
-    createInfo.ppEnabledExtensionNames = requiredExtensions.data();
+    if (!checkInstanceExtensionsSupport(neededExtensions))
+        throw std::runtime_error("[Instance creation] Needed extentions are not supported!");
+
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(neededExtensions.size());
+    createInfo.ppEnabledExtensionNames = neededExtensions.data();
 
 
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
@@ -45,7 +47,7 @@ Instance::Instance(const char* applicationName) {
     }
 
     if (vkCreateInstance(&createInfo, nullptr, &instance_) != VK_SUCCESS) { 
-        throw std::runtime_error("Echec de la création de l'instance!"); 
+        throw std::runtime_error("[Instance creation] Fail during instance creation!"); 
     }
     
     setupDebugMessenger();
@@ -106,8 +108,7 @@ void Instance::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoE
     createInfo.pfnUserCallback = debugCallback;
 }
 
-
-void Instance::checkExtensions(const std::vector<const char*>& requiredExtensionsNames) {
+bool Instance::checkInstanceExtensionsSupport(const std::vector<const char*>& neededExtensionsNames) {
 
     // get available extensions
     uint32_t extensionCount = 0;
@@ -118,20 +119,34 @@ void Instance::checkExtensions(const std::vector<const char*>& requiredExtension
      // get extentions names
      std::vector<const char*> aExtensionsNames;
      std::transform(availableExtensions.begin(), availableExtensions.end(), std::back_inserter(aExtensionsNames), [](VkExtensionProperties& ep) { return ep.extensionName; });
-     
 
-    std::cout << "Needed Extensions :\n";
-    for (const char* n : requiredExtensionsNames) {
-        bool provided = std::any_of(aExtensionsNames.begin(), aExtensionsNames.end(), [&n](const char* x) { return std::strcmp(x, n) == 0; });
-        std::cout << "- " << n << "( " << (provided ? "provided" : "missing") << " )" << std::endl;
-    }
+#ifndef NDEBUG
+     std::cout << "[check Instance Extension Support]" << std::endl << std::endl;
+     std::cout << "Available Extensions :" << std::endl;
+     for (const auto& ae : availableExtensions)
+         std::cout << "	- " << ae.extensionName << std::endl;
+     std::cout << std::endl << "Needed extentions :" << std::endl;
+#endif
 
-    // std::cout << "all available extentions :\n";
-    // for (const auto& ep : availableExtensions) {
-    //    std::cout << '- ' << ep.extensionName << std::endl;
-    // }
+     bool allFound = true;
+     for (const char* nExt : neededExtensionsNames) {
+#ifndef NDEBUG
+         std::cout << "	- " << nExt;
+#endif
+         if (!std::any_of(availableExtensions.begin(), availableExtensions.end(), [&nExt](const VkExtensionProperties& e) { return std::strcmp(nExt, e.extensionName) == 0; })) {
+#ifndef NDEBUG
+             std::cout << " (missing !)" << std::endl;
+#endif
+             allFound = false;
+             break;
+         }
+#ifndef NDEBUG
+         std::cout << " (provided)" << std::endl;
+#endif
+     }
+
+     return allFound;
 }
-
 
 bool Instance::checkValidationLayerSupport() {
     uint32_t layerCount;
@@ -158,7 +173,7 @@ bool Instance::checkValidationLayerSupport() {
     return true;
 }
 
-std::vector<const char*> Instance::getRequiredExtensions() {
+std::vector<const char*> Instance::getNeededExtensions() {
     // get required extensions using glfw for Vulkan interface window
     // because vulkan doesn't know the platform he's working on...
     uint32_t glfwExtensionCount = 0;

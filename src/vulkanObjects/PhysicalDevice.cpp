@@ -136,7 +136,7 @@ bool PhysicalDevice::checkDeviceExtensionSupport(const VkPhysicalDevice& device)
 
 	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
-#ifdef NDEBUG
+#ifndef NDEBUG
 	std::cout << "[check Device Extension Support]" << std::endl;
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
@@ -145,7 +145,7 @@ bool PhysicalDevice::checkDeviceExtensionSupport(const VkPhysicalDevice& device)
 		std::cout <<"	- " << ae.extensionName << std::endl;
 	std::cout << "needed extentions :" <<  std::endl;
 	for (const auto& ne : neededDeviceExtensions)
-		std::cout << "	- " << neededExtension << std::endl;
+		std::cout << "	- " << ne << std::endl;
 #endif
 
 	bool allFound = true;

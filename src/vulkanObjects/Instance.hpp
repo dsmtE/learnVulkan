@@ -5,10 +5,10 @@
 
 #include <vector>
 
-#ifdef NDEBUG
-constexpr bool enableValidationLayers = false;
-#else
+#ifndef NDEBUG
 constexpr bool enableValidationLayers = true;
+#else
+constexpr bool enableValidationLayers = false;
 #endif
 
 const std::vector<const char*> validationLayers = {
@@ -46,7 +46,7 @@ public:
 
 private:
     void setupDebugMessenger();
-    void checkExtensions(const std::vector<const char*>& requiredExtensionsNames);
+    bool checkInstanceExtensionsSupport(const std::vector<const char*>& neededExtensionsNames);
     bool checkValidationLayerSupport();
-    std::vector<const char*> getRequiredExtensions();
+    static std::vector<const char*> getNeededExtensions();
 };
