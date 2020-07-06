@@ -142,19 +142,24 @@ bool PhysicalDevice::checkDeviceExtensionSupport(const VkPhysicalDevice& device)
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 	std::cout << "AvailableExtensions for the device " << deviceProperties.deviceName << " :" << std::endl;
 	for (const auto& ae : availableExtensions)
-		std::cout <<"	- " << ae.extensionName << std::endl;
-	std::cout << "needed extentions :" <<  std::endl;
-	for (const auto& ne : neededDeviceExtensions)
-		std::cout << "	- " << ne << std::endl;
+		std::cout <<" - " << ae.extensionName << std::endl;
+	std::cout << std::endl << "Needed extentions :" <<  std::endl;
 #endif
 
 	bool allFound = true;
 	const auto end = availableExtensions.end();
 	for (const char* nExt : neededDeviceExtensions) {
+#ifndef NDEBUG
+		std::cout << " - " << nExt;
+#endif
 		if (!std::any_of(availableExtensions.begin(), availableExtensions.end(), [&nExt](const VkExtensionProperties& e) { return std::strcmp(nExt, e.extensionName) == 0; })) {
 			allFound = false;
 			break;
 		}
+#ifndef NDEBUG
+		std::cout << " (provided)" << std::endl;
+#endif
 	}
+
 	return allFound;
 }

@@ -131,12 +131,9 @@ bool Instance::checkInstanceExtensionsSupport(const std::vector<const char*>& ne
      bool allFound = true;
      for (const char* nExt : neededExtensionsNames) {
 #ifndef NDEBUG
-         std::cout << "	- " << nExt;
+         std::cout << " - " << nExt;
 #endif
          if (!std::any_of(availableExtensions.begin(), availableExtensions.end(), [&nExt](const VkExtensionProperties& e) { return std::strcmp(nExt, e.extensionName) == 0; })) {
-#ifndef NDEBUG
-             std::cout << " (missing !)" << std::endl;
-#endif
              allFound = false;
              break;
          }
