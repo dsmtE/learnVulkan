@@ -18,6 +18,9 @@ public:
     LogicalDevice(const PhysicalDevice& physicalDevice);
     ~LogicalDevice();
 
+    inline VkDevice& getVkDevice() { return logicalDevice_; };
+    inline const VkDevice& getVkDevice() const { return logicalDevice_; };
+
     inline VkQueue& graphicsQueue() { return graphicsQueue_; };
     inline const VkQueue& graphicsQueue() const  { return graphicsQueue_; };
 

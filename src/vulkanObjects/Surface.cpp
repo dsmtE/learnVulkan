@@ -1,4 +1,5 @@
 #include "Surface.hpp"
+
 #include <stdexcept>
 
 Surface::Surface(const VkInstance& instance, GLFWwindow* window) : instance_r{ instance } {

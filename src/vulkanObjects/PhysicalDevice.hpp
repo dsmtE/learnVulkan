@@ -28,11 +28,11 @@ public:
     PhysicalDevice(const VkInstance& instance, const VkSurfaceKHR& surface);
     ~PhysicalDevice();
 
-    inline VkPhysicalDevice& vkPhysicalDevice() { return physicalDevice_; }
-    inline const VkPhysicalDevice& vkPhysicalDevice() const { return physicalDevice_; }
+    inline VkPhysicalDevice& getVkPhysicalDevice() { return physicalDevice_; }
+    inline const VkPhysicalDevice& getVkPhysicalDevice() const { return physicalDevice_; }
 
-    inline QueueFamilyIndices& queueFamilyIndices() { return queueFamilyIndices_; };
-    inline const QueueFamilyIndices& queueFamilyIndices() const { return queueFamilyIndices_; };
+    inline QueueFamilyIndices& getQueueFamilyIndices() { return queueFamilyIndices_; };
+    inline const QueueFamilyIndices& getQueueFamilyIndices() const { return queueFamilyIndices_; };
 
 private:
     // Check if GPU is suitable and return rating throught reference

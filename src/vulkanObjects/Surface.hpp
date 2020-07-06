@@ -15,4 +15,5 @@ public:
 	~Surface();
 
 	inline VkSurfaceKHR& getVkSUrface() { return surface_; }
+	inline const VkSurfaceKHR& getVkSUrface() const { return surface_; }
 };

@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 LogicalDevice::LogicalDevice(const PhysicalDevice& physicalDevice) : logicalDevice_{ VK_NULL_HANDLE }, physicalDevice_r{ physicalDevice } {
-	const QueueFamilyIndices& indices = physicalDevice_r.queueFamilyIndices();
+	const QueueFamilyIndices& indices = physicalDevice_r.getQueueFamilyIndices();
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -40,7 +40,7 @@ LogicalDevice::LogicalDevice(const PhysicalDevice& physicalDevice) : logicalDevi
 		createInfo.enabledLayerCount = 0;
 	}
 
-	if (vkCreateDevice(physicalDevice_r.vkPhysicalDevice(), &createInfo, nullptr, &logicalDevice_) != VK_SUCCESS) {
+	if (vkCreateDevice(physicalDevice_r.getVkPhysicalDevice(), &createInfo, nullptr, &logicalDevice_) != VK_SUCCESS) {
 		throw std::runtime_error("[LogicalDevice] failure to create a logical device !");
 	}
 	// store Queue references 
