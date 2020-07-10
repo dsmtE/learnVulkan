@@ -19,6 +19,7 @@ private:
 
 	VkSwapchainKHR swapChain_;
 	std::vector<VkImage> imagesBuffer_;
+	std::vector<VkImageView> imagesViewsBuffer_;
 	VkFormat swapChainImageFormat_;
 	VkExtent2D swapChainExtent_;
 
@@ -31,4 +32,7 @@ public:
 	static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 	static VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+private:
+	void createImageViews();
 };

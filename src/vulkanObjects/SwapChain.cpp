@@ -64,6 +64,9 @@ SwapChain::SwapChain(const PhysicalDevice& physicalDevice, const LogicalDevice& 
 
 SwapChain::~SwapChain() {
     vkDestroySwapchainKHR(device_, swapChain_, nullptr);
+    for (auto imageView : imagesViewsBuffer_) {
+        vkDestroyImageView(device_, imageView, nullptr);
+    }
 }
 
 SwapChainSupportDetails SwapChain::querySwapChainSupport(const VkPhysicalDevice& device, const VkSurfaceKHR& surface) {
@@ -125,5 +128,30 @@ VkExtent2D SwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilit
         actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
 
         return actualExtent;
+    }
+}
+
+void SwapChain::createImageViews() {
+    imagesViewsBuffer_.resize(imagesBuffer_.size());
+
+    for (size_t i = 0; i < imagesBuffer_.size(); i++) {
+        VkImageViewCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        createInfo.image = imagesBuffer_[i];
+        createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        createInfo.format = swapChainImageFormat_;
+        createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        createInfo.subresourceRange.baseMipLevel = 0;
+        createInfo.subresourceRange.levelCount = 1;
+        createInfo.subresourceRange.baseArrayLayer = 0;
+        createInfo.subresourceRange.layerCount = 1;
+        
+        if (vkCreateImageView(device_, &createInfo, nullptr, &imagesViewsBuffer_[i]) != VK_SUCCESS) {
+            throw std::runtime_error("[SwapChain] Error: failure during the creation of image view!");
+        }
     }
 }
