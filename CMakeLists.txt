@@ -1,25 +1,17 @@
-# ///////////////////////////////// SETTINGS //////////////////////////////////
-
 cmake_minimum_required(VERSION 3.10)
 
 project(learnVulkan
     VERSION 0.0.1
     LANGUAGES CXX C    # C for GLFW
 )
-
+set(CMAKE_DEBUG_POSTFIX d)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#set output build directory
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out)
-
-# ////////////////////////////// PROJECT FILES ////////////////////////////////
-
-set(MAIN_FILE ${CMAKE_SOURCE_DIR}/src/main.cpp)
-file(GLOB_RECURSE SRC_FILES  ${CMAKE_SOURCE_DIR}/src/*.cpp )
-LIST(REMOVE_ITEM SRC_FILES ${MAIN_FILE})
-file(GLOB_RECURSE HEADER_FILES  ${CMAKE_SOURCE_DIR}/src/*.hpp )
+# Set output build directory
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/out/${CMAKE_BUILD_TYPE})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 # /////////////////////////////// DEPENDENCIES ////////////////////////////////
 
@@ -33,6 +25,12 @@ set(GLM_LIB_NAME glm)
 set(GLM_INC_PATH ${LIB_DIR}/glm)
 add_library(${GLM_LIB_NAME} INTERFACE)
 target_include_directories(${GLM_LIB_NAME} INTERFACE ${GLM_INC_PATH})
+
+# ////////// stb_image ////////// #
+set(STB_IMG_LIB_NAME stb_image)
+set(STB_IMG_INC_PATH ${LIB_DIR}/stb)
+add_library(${STB_IMG_LIB_NAME} INTERFACE)
+target_include_directories(${STB_IMG_LIB_NAME} INTERFACE ${STB_IMG_INC_PATH})
 
 # ////////// GLFW ////////// #
 set(GLFW_LIB_NAME glfw)
@@ -79,6 +77,7 @@ target_include_directories(${IMGUI_LIB_NAME} PUBLIC ${IMGUI_INC_PATH} ${GLFW_INC
 set(INCLUDE_DIRS
     ${Vulkan_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIR}
+    ${STB_IMG_INCLUDE_DIR}
     ${IMGUI_INC_PATH}
 )
 
@@ -86,21 +85,10 @@ set(LIBRARIES
     ${Vulkan_LIBRARIES}
     ${GLFW_LIB_NAME}
     ${GLM_LIB_NAME}
+    ${STB_IMG_LIB_NAME}
     ${IMGUI_LIB_NAME}
 )
 
-# /////////////////////////////////// BUILD ///////////////////////////////////
-
-get_filename_component(FILE_NAME ${MAIN_FILE} NAME_WE)
-add_executable(${FILE_NAME} ${MAIN_FILE} ${SRC_FILES} ${HEADER_FILES})
-
-# Enable warnings
-if(MSVC)
-	target_compile_options(${FILE_NAME} PRIVATE /W3)
-else()
-	target_compile_options(${FILE_NAME} PRIVATE -Wall -Wno-missing-braces -Wno-attributes -pedantic)
-endif()
-
-target_link_libraries(${FILE_NAME} PUBLIC ${LIBRARIES})
-target_include_directories(${FILE_NAME} PUBLIC ${INCLUDE_DIRS})
-
+set(exe_name "learnVulkan")
+add_subdirectory(assets)
+add_subdirectory(src)
