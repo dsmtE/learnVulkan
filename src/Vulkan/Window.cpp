@@ -34,6 +34,12 @@ namespace Vulkan {
 			if (this_->OnScroll)
 				this_->OnScroll(xoffset, yoffset);
 		}
+
+		void GlfwFramebufferSizeCallback(GLFWwindow* window, const int width, const int height) {
+			auto* const this_ = static_cast<Window*>(glfwGetWindowUserPointer(window));
+			if (this_->OnFramebufferSize)
+				this_->OnFramebufferSize(width, height);
+		}
 	}
 
 	Window::Window(const WindowConfig& config) : config_(config) {
@@ -69,6 +75,7 @@ namespace Vulkan {
 		glfwSetKeyCallback(window_, GlfwKeyCallback);
 		glfwSetCursorPosCallback(window_, GlfwCursorPositionCallback);
 		glfwSetMouseButtonCallback(window_, GlfwMouseButtonCallback);
+		glfwSetScrollCallback(window_, GlfwScrollCallback);
 		glfwSetScrollCallback(window_, GlfwScrollCallback);
 	}
 

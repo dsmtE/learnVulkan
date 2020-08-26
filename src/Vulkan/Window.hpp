@@ -36,6 +36,7 @@ namespace Vulkan {
 		std::function<void(double xpos, double ypos)> OnCursorPosition;
 		std::function<void(int button, int action, int mods)> OnMouseButton;
 		std::function<void(double xoffset, double yoffset)> OnScroll;
+		std::function<void(int width, int height)> OnFramebufferSize;
 
 		// Methods
 		void Close();
