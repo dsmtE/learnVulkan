@@ -4,9 +4,32 @@ project(learnVulkan
     VERSION 0.0.1
     LANGUAGES CXX C    # C for GLFW
 )
+
 set(CMAKE_DEBUG_POSTFIX d)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Default to RelWithDebInfo if not specified
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Specifies the build type on single-configuration generators" FORCE)
+endif ()
+
+if (WIN32)
+    # Reduce the Win32 header files size
+	add_definitions(-DWIN32_LEAN_AND_MEAN)
+
+    add_compile_options("/Wall")
+	# Enabling Multi-Processor compilation
+	add_compile_options("/MP")
+	
+elseif (UNIX)
+	
+	add_definitions(-DUNIX)
+	add_compile_options("-Wall")
+    add_compile_options("-pedantic")
+	add_compile_options("-fvisibility=hidden")
+
+endif ()
 
 # Set output build directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/out/${CMAKE_BUILD_TYPE})
@@ -91,6 +114,7 @@ target_include_directories(${IMGUI_LIB_NAME} PUBLIC ${IMGUI_INC_PATH} ${GLFW_INC
 
 set(INCLUDE_DIRS
     ${Vulkan_INCLUDE_DIRS}
+    ${glfw3_INCLUDE_DIRS}
     ${GLM_INCLUDE_DIR}
     ${STB_IMG_INCLUDE_DIR}
     ${IMGUI_INC_PATH}
