@@ -18,7 +18,7 @@ if (WIN32)
     # Reduce the Win32 header files size
 	add_definitions(-DWIN32_LEAN_AND_MEAN)
 
-    add_compile_options("/Wall")
+    add_compile_options("/W3")
 	# Enabling Multi-Processor compilation
 	add_compile_options("/MP")
 	
@@ -32,9 +32,17 @@ elseif (UNIX)
 endif ()
 
 # Set output build directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/out/${CMAKE_BUILD_TYPE})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+
+# Remove CONFIGURATION_TYPES sub directories
+foreach (OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR}/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_BINARY_DIR}/lib)
+endforeach()
 
 # /////////////////////////////// DEPENDENCIES ////////////////////////////////
 
