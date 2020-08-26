@@ -2,21 +2,13 @@
 
 #include "Vulkan.hpp"
 
+#include "WindowConfig.hpp"
+
 #include <functional>
-// #include <cstdint>
 #include <string>
 #include <vector>
 
 namespace Vulkan {
-
-	struct WindowConfig {
-		std::string Title;
-		uint32_t Width;
-		uint32_t Height;
-		bool CursorDisabled;
-		bool Fullscreen;
-		bool Resizable;
-	};
 
 	class Window final {
 	public:
