@@ -20,6 +20,21 @@ set(LIB_DIR ${PROJECT_SOURCE_DIR}/libs)
 # ////////// Vulkan ////////// #
 find_package(Vulkan REQUIRED)
 
+if (NOT Vulkan_FOUND)
+    message(FATAL_ERROR "Could not find Vulkan library!")
+else ()
+    message(STATUS ${Vulkan_LIBRARY})
+endif ()
+
+find_program(Vulkan_GLSLANG_VALIDATOR 
+	NAMES glslangValidator 
+	HINTS ENV VULKAN_SDK 
+	PATH_SUFFIXES bin)
+	
+if (NOT Vulkan_GLSLANG_VALIDATOR)
+    message(FATAL_ERROR "glslangValidator not found!")
+endif()
+
 # ////////// GLM ////////// #
 set(GLM_LIB_NAME glm)
 set(GLM_INC_PATH ${LIB_DIR}/glm)

@@ -38,4 +38,4 @@ set_target_properties(${exe_name} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX
 
 target_link_libraries(${exe_name} PUBLIC ${LIBRARIES})
 target_include_directories(${exe_name} PUBLIC ${INCLUDE_DIRS})
-add_dependencies(${exe_name} Assets)
+add_dependencies(${exe_name} Assets Shaders)
