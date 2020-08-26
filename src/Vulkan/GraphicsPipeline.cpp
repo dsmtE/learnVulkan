@@ -126,8 +126,7 @@ GraphicsPipeline::GraphicsPipeline(
 	Check(vkCreateGraphicsPipelines(device.Handle(), nullptr, 1, &pipelineInfo, nullptr, &pipeline_), "create graphics pipeline");
 }
 
-GraphicsPipeline::~GraphicsPipeline()
-{
+GraphicsPipeline::~GraphicsPipeline() {
 	if (pipeline_ != nullptr) {
 		vkDestroyPipeline(swapChain_.Device().Handle(), pipeline_, nullptr);
 		pipeline_ = nullptr;

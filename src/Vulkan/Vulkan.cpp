@@ -1,4 +1,5 @@
 #include "Vulkan.hpp"
+
 #include <stdexcept>
 
 namespace Vulkan {
@@ -8,10 +9,8 @@ namespace Vulkan {
 			throw std::runtime_error(std::string("[VulkanError] Failed to ") + operation + " (" + toString(result) + ")");
 	}
 
-	const char* toString(const VkResult result)
-	{
-		switch (result)
-		{
+	const char* toString(const VkResult result) {
+		switch (result) {
 #define STR(r) case VK_##r: return #r
 			STR(SUCCESS);
 			STR(NOT_READY);

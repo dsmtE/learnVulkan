@@ -2,6 +2,8 @@
 
 #include "Vulkan.hpp"
 
+#include <memory>
+
 namespace Vulkan {
 	class PipelineLayout;
 	class SwapChain;
