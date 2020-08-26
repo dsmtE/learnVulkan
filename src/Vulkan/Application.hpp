@@ -39,6 +39,7 @@ namespace Vulkan {
 
 		virtual void CreateSwapChain();
 		virtual void DeleteSwapChain();
+		virtual void createCommandBuffers();
 		virtual void DrawFrame();
 		virtual void Render(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 

@@ -59,12 +59,14 @@ void Application::SetPhysicalDevice(VkPhysicalDevice physicalDevice) {
 		throw std::logic_error("physical device has already been set");
 
 	device_.reset(new class Device(physicalDevice, *surface_));
-	commandPool_.reset(new class CommandPool(*device_, device_->GraphicsFamilyIndex(), true));
+	commandPool_.reset(new class CommandPool(*device_, device_->GraphicsFamilyIndex(), false));
 
 	OnDeviceSet();
 
-	// Create swap chain and command buffers
+	// Create swap chain
 	CreateSwapChain();
+	// Create command buffers
+	createCommandBuffers();
 }
 
 void Application::Run() {
@@ -107,7 +109,7 @@ void Application::CreateSwapChain() {
 		swapChainFramebuffers_.emplace_back(*imageView, graphicsPipeline_->RenderPass());
 	}
 
-	commandBuffers_.reset(new CommandBuffers(*commandPool_, static_cast<uint32_t>(swapChainFramebuffers_.size())));
+
 }
 
 void Application::DeleteSwapChain() {
@@ -118,6 +120,16 @@ void Application::DeleteSwapChain() {
 	renderFinishedSemaphores_.clear();
 	imageAvailableSemaphores_.clear();
 	swapChain_.reset();
+}
+
+void Application::createCommandBuffers() {
+	commandBuffers_.reset(new CommandBuffers(*commandPool_, static_cast<uint32_t>(swapChainFramebuffers_.size())));
+
+	for (size_t i = 0; i < commandBuffers_->Size(); ++i) {
+		const auto commandBuffer = commandBuffers_->Begin(i);
+		Render(commandBuffer, i);
+		commandBuffers_->End(i);
+	}
 }
 
 void Application::DrawFrame() {
@@ -141,15 +153,10 @@ void Application::DrawFrame() {
 		throw std::runtime_error(std::string("failed to acquire next image (") + toString(result) + ")");
 	}
 
-	// TODO do not recreate commandBuffers
-	const auto commandBuffer = commandBuffers_->Begin(imageIndex);
-	Render(commandBuffer, imageIndex);
-	commandBuffers_->End(imageIndex);
-
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-	VkCommandBuffer commandBuffers[]{ commandBuffer };
+	VkCommandBuffer commandBuffers[]{ commandBuffers_->get(currentFrame_) };
 	VkSemaphore waitSemaphores[] = { imageAvailableSemaphore };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
